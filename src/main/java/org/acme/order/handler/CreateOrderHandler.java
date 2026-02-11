@@ -9,10 +9,10 @@ import org.acme.order.api.CreateOrderRequest;
 import org.acme.order.domain.Order;
 import org.acme.order.service.OrderService;
 import org.acme.support.AppError;
-import org.acme.support.AppError.ErrorResponse;
 import org.acme.support.AppError.InternalAppError;
 import org.acme.support.AppError.NotFoundError;
 import org.acme.support.AppError.ValidationError;
+import org.acme.support.AppResponse;
 import org.acme.support.Result;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -67,7 +67,7 @@ public class CreateOrderHandler
                 .toList();
         return new APIGatewayProxyResponseEvent()
             .withStatusCode(400)
-            .withBody(buildBody(ErrorResponse.fromErrors("Validation failed", errors)))
+            .withBody(buildBody(AppResponse.fromErrors("Validation failed", errors)))
             .withHeaders(corsHeaders(Map.of("Content-Type", "application/json")));
       }
 
@@ -104,11 +104,11 @@ public class CreateOrderHandler
       return new APIGatewayProxyResponseEvent()
           .withStatusCode(HttpStatusCode.INTERNAL_SERVER_ERROR)
           .withHeaders(corsHeaders(Map.of("Content-Type", "application/json")))
-          .withBody(buildBody(ErrorResponse.fromMessage("Internal server error")));
+          .withBody(buildBody(AppResponse.fromMessage("Internal server error")));
     }
   }
 
-  private String buildBody(ErrorResponse response) {
+  private String buildBody(AppResponse response) {
     ObjectNode root = mapper.createObjectNode().put("message", response.message());
     if (response.errors() != null) {
       root.set("errors", mapper.valueToTree(response.errors()));
@@ -117,7 +117,7 @@ public class CreateOrderHandler
   }
 
   private String buildBody(AppError error) {
-    return buildBody(ErrorResponse.fromError(error));
+    return buildBody(AppResponse.fromError(error));
   }
 
   private Map<String, String> corsHeaders() {
