@@ -8,4 +8,4 @@ pluginManagement {
     id "${quarkusPluginId}" version "${quarkusPluginVersion}"
   }
 }
-rootProject.name='order-aws'
+rootProject.name='order-lambda'
